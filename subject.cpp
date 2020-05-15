@@ -20,12 +20,11 @@
 namespace corsim
 {
 
-Subject::Subject(int x, int y, int radius, bool infected)
+Subject::Subject(int x, int y, int radius)
 {
     this->_x = x;
     this->_y = y;
     this->_radius = radius;
-    this->_infected = infected;
 }
 
 double Subject::x()
@@ -73,16 +72,6 @@ int Subject::radius()
     return this->_radius;
 }
 
-bool Subject::infected()
-{
-    return this->_infected;
-}
-
-void Subject::infect()
-{
-    this->_infected = true;
-}
-
 double Subject::angle()
 {
     return atan2(_dy,_dx);
@@ -91,6 +80,41 @@ double Subject::angle()
 double Subject::speed()
 {
     return sqrt(_dx * _dx + _dy * _dy);
+}
+
+int Subject::infected()
+{
+    return this->_time_till_immunity;
+}
+
+int Subject::immune()
+{
+    return this->_immunity_time;
+}
+
+void Subject::minus_infection()
+{
+    this->_time_till_immunity = _time_till_immunity-1;
+}
+
+void Subject::minus_immunity()
+{
+    this->_immunity_time = _immunity_time-1;
+}
+
+void Subject::infect()
+{
+    this->_time_till_immunity = 600;
+}
+
+void Subject::immunized()
+{
+    this->_immunity_time = 1400;
+}
+
+void Subject::set_strategy(MovementStrategy *strategy)
+{
+    this->strategy_ = strategy;
 }
 
 }

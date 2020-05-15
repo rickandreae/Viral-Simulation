@@ -16,9 +16,12 @@
 
 #pragma once 
 
+#include <string>
+#include "MovementStrategy.h"
+
 namespace corsim
 {
-    
+class MovementStrategy;
 /**
  * A subject is an entity within the simulation. It is modeled as a
  * circle in 2D and can be infected.
@@ -26,7 +29,7 @@ namespace corsim
 class Subject
 {
     public:
-        Subject(int x, int y, int radius, bool infected);
+        Subject(int x, int y, int radius);
         double x();
         double y();
         void set_x(double x);
@@ -36,14 +39,21 @@ class Subject
         int radius(); //Radius needed for collisions
         void set_dx(double dx);
         void set_dy(double dy);
-        bool infected();
-        void infect();
+        int infected();//infection time left
+        int immune();//immunity time left
+        void infect();//sets target infected for a limited time
         double angle();
         double speed();
+        void set_strategy(MovementStrategy *strategy);//sets desired strategy
+        void immunized();//sets target immune for a limited time
+        void minus_immunity();//immunity degrader
+        void minus_infection();//virus degrader
+        MovementStrategy *strategy_;
     private:
         double _x = 0,_y = 0, _dx = 0, _dy = 0;
-        bool _infected = false;
         int _radius = 0;
+        int _immunity_time = 0;
+        int _time_till_immunity = 0;
 };
 
 };

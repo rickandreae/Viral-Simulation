@@ -78,10 +78,11 @@ void Simulation::tick()
 
     for(Subject& s : _subjects)
     {
-        s.set_x(s.x() + s.dx() * dt);
-        s.set_y(s.y() + s.dy() * dt);
+        //set target to stsrategy speed
+        s.set_x(s.x() + s.dx() * s.strategy_->subjectSpeed());
+        s.set_y(s.y() + s.dy() * s.strategy_->subjectSpeed());
 
-        if(s.infected())
+        if(s.infected() > 0)
         {
             numberInfected++;
         }
@@ -108,10 +109,25 @@ void Simulation::draw_to_canvas()
     {
         CanvasColor c = BLUE;
 
-        if(s.infected())
+        if(s.immune() > 0)
+        {
+            c = GREEN;
+            //immunity degradation
+            s.minus_immunity();
+        }
+
+        if(s.infected() > 0)
         {
             c = RED;
+            //infection degradation
+            s.minus_infection();
+            //if zero target is immmune 
+            if(s.infected() == 0){
+                s.immunized();
+            }
         }
+
+
 
         _canvas.get()->draw_ellipse(s.x(), s.y(), s.radius(), c);
     }
@@ -152,11 +168,15 @@ void Simulation::subject_collision(Subject& s1, Subject& s2)
 
     if(dist < s1.radius() + s2.radius())
     {
-        if(s1.infected() || s2.infected())
+        //split so infected dont stay infected when spreading infection
+        if(s1.infected() > 0 && s2.immune() == 0 && s2.infected() == 0)
+        {
+            s2.infect();
+        }   
+        if(s2.infected() > 0 && s1.immune() == 0 && s1.infected() == 0)
         {
             s1.infect();
-            s2.infect();
-        }        
+        }   
 
         double theta1 = s1.angle();
         double theta2 = s2.angle();

@@ -20,6 +20,8 @@
 #include <math.h>
 #include "html_canvas.h"
 #include "ChartJS_handler.h"
+#include "LockdownMovementStrategy.h"
+#include "RegularMovementStrategy.h"
 
 //Constants to control the simulation
 const int SUBJECT_COUNT = 200;
@@ -39,15 +41,22 @@ int main() {
     std::uniform_real_distribution<double> dist_dx(-1.0, 1.0);
     std::uniform_real_distribution<double> dist_dy(-1.0, 1.0);
 
+    int number = SUBJECT_COUNT*0.25;//calculate outside for loop to save resources
     for (int i = 0; i<SUBJECT_COUNT; ++i)
     {
         double x = dist_w(mt); //Randomly generate x position
         double y = dist_h(mt); //Randomly generate y position
         
-        corsim::Subject su(x,y,SUBJECT_RADIUS,false);
+        corsim::Subject su(x,y,SUBJECT_RADIUS);
 
         su.set_dx(dist_dx(mt));
         su.set_dy(dist_dy(mt));
+
+        if(i<number){
+        su.set_strategy(new corsim::RegularMovementStrategy);//set regular strategy on first 25%
+        }else{
+        su.set_strategy(new corsim::LockdownMovementStrategy);//set rest to lockdown
+        }
 
         if(i == SUBJECT_COUNT-1)
         {
